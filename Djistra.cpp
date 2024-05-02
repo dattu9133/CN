@@ -5,66 +5,65 @@
 
 using namespace std;
 
-void met(vector<vector<int>> &graph, int source, int destination) // Corrected template argument list
+void dijkstra(vector<vector<int>> &graph, int source)
 {
     int V = graph.size();
-    if (source >= V || destination >= V)
-    {
-        cout << "Not possible";
-        return;
-    }
     vector<int> dist(V, INT_MAX);
-    vector<bool> splset(V, false);
-    vector<int> pred(V, -1);
+    vector<bool> visited(V, false);
     dist[source] = 0;
 
-    for (int i = 0; i < V - 1; i++)
+    for (int i = 0; i < V - 1; ++i)
     {
-        int u = min_element(dist.begin(), dist.end()) - dist.begin();
-        splset[u] = true;
+        int u = -1;
+        for (int j = 0; j < V; ++j)
+        {
+            if (!visited[j] && (u == -1 || dist[j] < dist[u]))
+            {
+                u = j;
+            }
+        }
+
+        if (dist[u] == INT_MAX)
+            break;
+
+        visited[u] = true;
+
         for (int v = 0; v < V; ++v)
         {
-            if (!splset[v] && graph[u][v] && dist[u] != INT_MAX && dist[v] > dist[u] + graph[u][v])
+            if (graph[u][v] && dist[v] > dist[u] + graph[u][v])
             {
                 dist[v] = dist[u] + graph[u][v];
-                pred[v] = u;
             }
         }
     }
 
-    if (dist[destination] == INT_MAX)
+    cout << "Shortest distances from source " << source << ":" << endl;
+    for (int i = 0; i < V; ++i)
     {
-        cout << "No path exists";
-        return;
+        if ((i == source) || (dist[i] == INT_MAX))
+            continue;
+        else
+            cout << source << "->" << i << " : " << dist[i] << endl;
     }
-
-    cout << "Shortest distance: " << dist[destination] << endl;
-    cout << "Shortest path: ";
-    vector<int> path;
-    for (int i = destination; i != -1; i = pred[i])
-        path.push_back(i);
-    reverse(path.begin(), path.end());
-    for (int i : path)
-        cout << i << "->";
 }
 
 int main()
 {
-    int n, x, y;
-    
+    int n, x;
+
     cout << "Enter the number of nodes: ";
     cin >> n;
     vector<vector<int>> graph(n, vector<int>(n));
-    cout<<"Enter the cost matrix: ";
-    for (int i = 0; i < n; i++)
+    cout << "Enter the cost matrix:" << endl;
+    for (int i = 0; i < n; ++i)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < n; ++j)
         {
             cin >> graph[i][j];
         }
     }
-    cout<<"Enter the source and destination node: ";
-    cin >> x >> y;
-    met(graph, x, y);
+    cout << "Enter the source node: ";
+    cin >> x;
+    dijkstra(graph, x);
     return 0;
 }
